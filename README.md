@@ -1,5 +1,6 @@
 # Air filter box
-for the next wildfire season.
+
+Getting ready for the next wildfire season.
 
 This is using [MERV13 filters from Amazon](https://amazon.com/dp/B00CJZ7TB2)
 
@@ -7,14 +8,16 @@ This is using [MERV13 filters from Amazon](https://amazon.com/dp/B00CJZ7TB2)
 
 The cut is dependent on the thickness of the used plywood. To generate DXF
 file, [OpenSCAD] needs to be installed. Then, measure the
-actual thickness of the plywood.
+actual thickness of the plywood with calipers.
 
-Let's assume it is **5.7mm**. Then this command will generate the necessary
+Let's assume we measure **5.7mm**. Then this command will generate the necessary
 DXF file:
 
 ```
 make air-filter-cuts-5.7mm.dxf
 ```
+
+As an example, there is a 5.5mm size pre-generated [air-filter-cuts-5.5mm.dxf](./air-filter-cuts-5.5mm.dxf) in this directory.
 
 ### Laser cut
 
@@ -41,5 +44,9 @@ Note, the center cross at the bottom and diagonal slots at the top-plate
 corners are not yet used (will be for the fan mount later)
 
 ![](img/assembly-draw.gif)
+
+If things look like this, PM2.5 is probably high, and it is good to have
+such filter:
+![](img/sf-2020-09-09.jpg)
 
 [OpenScad]: https://openscad.org/downloads.html
