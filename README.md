@@ -4,6 +4,8 @@ Getting ready for the next wildfire season.
 
 This is using [MERV13 filters from Amazon](https://amazon.com/dp/B00CJZ7TB2)
 
+![](img/air-filter.png)
+
 ### Generate file
 
 The cut is dependent on the thickness of the used plywood. To generate DXF
