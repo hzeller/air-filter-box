@@ -8,11 +8,12 @@ ply_wiggle=0.1;   // Space around slots finger slots.
 filter_wiggle_room=1;
 
 // Filter sizes according to https://amazon.com/dp/B00CJZ7TB2
-filter_w = (filter_wiggle_room + 391);   // mm Wide
-filter_h = (filter_wiggle_room + 619.5); // mm High
-filter_t = (filter_wiggle_room + 92.5);  // mm Thick
+// (but then measured)
+filter_w = (filter_wiggle_room + 393);   // mm Wide
+filter_h = (filter_wiggle_room + 622);   // mm High
+filter_t = (filter_wiggle_room + 94);    // mm Thick
 
-filter_rim=30;             // cardboard edge around filter
+filter_rim=25;             // cardboard edge around filter
 
 fan_inner_r=10*25.4;       // Visualization of fan size.
 
