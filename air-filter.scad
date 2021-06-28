@@ -1,5 +1,5 @@
 // (c) 2021 Henner Zeller. License: CC-BY-SA
-$fn=50;
+$fn=90;
 e=0.05;
 
 ply_thick=6;      // mm. Measured plywood thickness.
@@ -16,6 +16,11 @@ filter_t = (filter_wiggle_room + 94);    // mm Thick
 filter_rim=25;             // cardboard edge around filter
 
 fan_inner_r=10*25.4;       // Visualization of fan size.
+fan_hold_ring_inner=117;
+fan_hold_ring_outer=fan_hold_ring_inner + 2*15;
+fan_foam_thick=30;
+
+fan_ring_pos=filter_h - ply_thick - fan_foam_thick;
 
 // Animation of the 'explosion' view.
 explode_factor=-cos(360*$t)/2+0.5;
@@ -106,21 +111,72 @@ module filter_box(show_filter=true, extra=0, explode=0) {
      rotate([0, 0, 180]) filter_half_box(show_filter, extra, explode);
 }
 
-module fan_holder(extra=0) {
+module fan_ring_base() {
+     difference() {
+	  cylinder(r=fan_hold_ring_outer/2, h=ply_thick);
+	  translate([0, 0, -e]) cylinder(r=fan_hold_ring_inner/2, h=ply_thick+2*e);
+     }
+}
+
+module fan_ring() {
+     difference() {
+	  fan_ring_base();
+	  translate([0, 0, -fan_ring_pos]) {
+	       rotate([0, 0, -45]) fan_holder();
+	       rotate([0, 0, +45]) fan_holder();
+	  }
+     }
+}
+
+module fan_holder(extra=0, left=false) {
+     center_clearance=0.8;  // Leave a bit of center wiggle room
+     finger_w=12;
      t = ply_thick + extra;
      diagonal = (filter_w-7) * sqrt(2);
-     rotate([0, 0, 45]) {
-	  //translate([-t/2, -diagonal/2, 0]) cube([t, diagonal, filter_h]);
-	  // nice shape needed.
-	  // vertical slot needed
-	  finger_w=12;
-	  for (symmetry = [-1, 1]) {
-	       scale([1, symmetry, 1]) {
-		    for (notch = [40, 90]) {
-			 translate([-t/2, notch-finger_w/2, -ply_thick-e]) cube([t, finger_w, ply_thick+2*e]);
-		    }
-		    translate([-t/2, diagonal/2-finger_w, filter_h-e]) cube([t, finger_w, ply_thick+2*e]);
+     center_w=fan_hold_ring_outer;
+     difference() {
+	  union() {
+	       // Main body
+	       hull() {
+		    translate([-t/2, -center_w/2, 0]) cube([t, center_w, fan_ring_pos]);
+		    translate([-t/2, -200/2, 0]) cube([t, 200, 10]);
 	       }
+
+
+	       // one side-arm
+	       for (symmetry = [-1, 1]) hull() {
+		    translate([-t/2, symmetry*(diagonal/2-finger_w/2), filter_h-e-finger_w/2])
+			 rotate([0, 90, 0]) cylinder(r=finger_w/2, h=t);
+
+		    translate([-t/2, symmetry*fan_hold_ring_inner/2, fan_ring_pos-60])
+			 rotate([0, 90, 0]) cylinder(r=30, h=t);
+	       }
+
+	  }
+
+	  // Space to house motor
+	  translate([0, 0, fan_ring_pos - 40])
+	       cylinder(r=fan_hold_ring_inner/2, h=45);
+
+	  // Vertical slot
+	  translate([-25, -t/2, left ? 0 : filter_h/2-center_clearance])
+	       cube([50, t, filter_h/2+center_clearance]);
+     }
+
+     // vertical slot needed
+
+     for (symmetry = [-1, 1]) {
+	  scale([1, symmetry, 1]) {
+	       // Bottom fingers
+	       for (notch = [40, 90]) {
+		    translate([-t/2, notch-finger_w/2, -ply_thick-e]) cube([t, finger_w, ply_thick+2*e]);
+	       }
+
+	       // Top fingers
+	       translate([-t/2, diagonal/2-finger_w, filter_h-e-finger_w/2]) cube([t, finger_w, ply_thick+2*e+finger_w/2]);
+
+	       // Fingers for motor fan_ring
+	       translate([-t/2, fan_hold_ring_inner/2-2*e, fan_ring_pos]) cube([t, 8, ply_thick+2*e]);
 	  }
      }
 }
@@ -165,8 +221,8 @@ module bottom_board() {
      difference() {
 	  translate([0, 0, -ply_thick]) box_end();
 	  translate([0, 0, e]) filter_box(show_filter=false, extra=ply_wiggle);
-	  fan_holder(extra=ply_wiggle);
-	  rotate([0, 0, 90]) fan_holder(extra=ply_wiggle);
+	  rotate([0, 0, +45]) fan_holder(extra=ply_wiggle);
+	  rotate([0, 0, -45]) fan_holder(extra=ply_wiggle);
      }
 }
 
@@ -191,16 +247,25 @@ module assembly(show_filter=true) {
      filter_box(show_filter=show_filter, explode=explode_factor);
      translate([0, 0, filter_h + 1.5*filter_h * explode_factor]) fan();
 
-     if (false) {  // fan holder not ready yet.
-	  fan_holder();
-	  rotate([0, 0, 90]) fan_holder();
-     }
+     translate([0, 0, 1.1*filter_h * explode_factor])
+	  rotate([0, 0, -45]) fan_holder(left=true);
+     rotate([0, 0, +45]) fan_holder();
+     translate([0, 0, 1.15*filter_h * explode_factor])
+	  translate([0, 0, fan_ring_pos]) fan_ring();
 }
 
 module top_2d() { projection(cut=false) top_board(); }
 module bottom_2d() { projection(cut=false) bottom_board(); }
 module zarge_2d() {
      projection(cut=false) rotate([90, 0, 0]) zarge(extra=0);
+}
+
+module fan_ring_2d() {
+     projection(cut=false) fan_ring();
+}
+
+module fan_holder_2d(left=true) {
+     projection(cut=false) rotate([0, 90, 0]) fan_holder(extra=ply_wiggle, left=left);
 }
 
 module bottom_stop2d() {
@@ -219,6 +284,12 @@ module cuts() {
 	  for (i = [0 : 7]) {
 	       translate([i * (ply_thick+filter_rim+5), 0, 0]) bottom_stop2d();
 	  }
+     }
+
+     translate([900, -600, 0]) {
+	  translate([0, filter_h+20, 0]) fan_ring_2d();
+	  translate([180, filter_h-125, 0]) rotate([0, 0, -90]) fan_holder_2d(left=false);
+	  rotate([0, 0, 90]) fan_holder_2d(left=true);
      }
 }
 
