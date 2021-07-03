@@ -3,6 +3,8 @@
 Getting ready for the next wildfire season.
 
 This is using [MERV13 filters from Amazon](https://amazon.com/dp/B00CJZ7TB2)
+as well as the guts from
+[some well-made fans](https://amazon.com/dp/B08GLV99T9).
 
 ![](img/air-filter.png)
 
